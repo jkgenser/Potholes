@@ -40,7 +40,7 @@ server <- function(input, output) {
   output$map <- renderLeaflet ({
     leaflet(df) %>%
     setView(-71.083, 42.353, 13) %>%
-    addProviderTiles("Stamen.TonerHybrid", options = providerTileOptions(noWrap=T)) %>%
+    addProviderTiles("Stamen.TonerLite", options = providerTileOptions(noWrap=T)) %>%
     addLegend("bottomright", pal = pal, values = df$lag, title ="Days Until Repair" , opacity = 1) %>%
     addCircles(data = cznData, radius=35, stroke=FALSE, fillColor = pal(cznData$lag),
                fillOpacity = 0.75,
