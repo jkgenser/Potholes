@@ -1,7 +1,8 @@
 #setwd("H:/USER/JGenser/Pot Holes/Program")
 library(leaflet)
 library(shiny)
-library(plyr)
+library(dplyr)
+library(colorRamps)
 
 ##import cleaned pothole data
 df = read.csv("mappingData.csv",header=T, sep =",")
@@ -16,7 +17,8 @@ df$lag[which(df$lag > 21  )] <- 22
 
 
 ##create color palate
-cpal <- colorNumeric(palette = colorRamp(c("dodgerblue4", "Dark Red")), domain = sort(df$lag, decreasing=F))
+#pal <- colorBin("RdYlGn", sort(df$lag, decreasing=F))
+pal <- colorBin(matlab.like(length(df$lag)), df$lag)
 
 cznData = subset(df, grepl("Citizen", Source))
 ctyData = subset(df, grepl("City", Source))
@@ -39,27 +41,27 @@ server <- function(input, output) {
   output$map <- renderLeaflet ({
     leaflet(df) %>%
     setView(-71.083, 42.353, 13) %>%
-    addProviderTiles("Stamen.TonerLite", options = providerTileOptions(noWrap=T)) %>%
-    addLegend("bottomright", pal = cpal, values = df$lag, title ="Days Until Repair" , opacity = 1) %>%
-    addCircles(data = cznData, radius=1, color=cpal(df$lag), fillColor = cpal(df$lag),
-               fillOpacity = 0.2, opacity = 0.2, 
+    addProviderTiles("Stamen.TonerHybrid", options = providerTileOptions(noWrap=T)) %>%
+    addLegend("bottomright", pal = pal, values = df$lag, title ="Days Until Repair" , opacity = 1) %>%
+    addCircles(data = cznData, radius=35, stroke=FALSE, fillColor = pal(cznData$lag),
+               fillOpacity = 0.75,
                group = "Citizens Connect App") %>%
-    addCircles(data = ctyData, radius=1, color=cpal(df$lag), fillColor = cpal(df$lag),
-               fillOpacity = 0.2, opacity = 0.2,
+    addCircles(data = ctyData, radius=35, stroke=FALSE, fillColor = pal(ctyData$lag),
+               fillOpacity = 0.75,
                group = "City Workers App") %>%
-    addCircles(data = callData, radius=1, color=cpal(df$lag), fillColor = cpal(df$lag),
-               fillOpacity = 0.2, opacity = 0.2,
+    addCircles(data = callData, radius=35, stroke=FALSE, fillColor = pal(callData$lag),
+               fillOpacity = 0.75,
                group = "Constituent Call-in") %>%
-    addCircles(data = selfData, radius=1, color=cpal(df$lag), fillColor = cpal(df$lag),
-               fillOpacity = 0.2, opacity = 0.2,
+    addCircles(data = selfData, radius=35, stroke=FALSE, fillColor = pal(selfData$lag),
+               fillOpacity = 0.75,
                group = "Self Service") %>%
-    addCircles(data = empData, radius=1, color=cpal(df$lag), fillColor = cpal(df$lag),
-               fillOpacity = 0.2, opacity = 0.2,
+    addCircles(data = empData, radius=35, stroke=FALSE, fillColor = pal(empData$lag),
+               fillOpacity = 0.75,
                group = "Employee Generated") %>%
-    addCircles(data = cambData, radius=1, color=cpal(df$lag), fillColor = cpal(df$lag),
-               fillOpacity = 0.2, opacity = 0.2,
+    addCircles(data = cambData, radius=35, stroke=FALSE, fillColor = pal(df$lag),
+               fillOpacity = 0.75,
                group = "Cambridge (Source NA)") %>%
-    addCircles(data = many, radius = 1, color = "black", fillColor = "grey", fillOpacity = 0.5, opacity=0.5,
+    addCircles(data = many, radius = 35, stroke=FALSE, fillColor = "black", fillOpacity = 0.8,
                group = "Repeat Offender")  %>%
     addLayersControl(overlayGroups = 
                       c("Citizens Connect App", "City Workers App", "Constituent Call-in", "Self Service", "Employee Generated", "Cambridge (Source NA)", "Repeat Offender"),
