@@ -1,7 +1,6 @@
 #setwd("H:/USER/JGenser/Pot Holes/Program")
 library(leaflet)
 library(shiny)
-library(dplyr)
 library(colorRamps)
 
 ##import cleaned pothole data
